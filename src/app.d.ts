@@ -1,4 +1,4 @@
-import { MetaMaskInpageProvider } from "@metamask/providers";
+import type { Eip1193Provider } from "ethers";
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
@@ -12,7 +12,7 @@ declare global {
     }
 
     interface Window {
-        ethereum?: MetaMaskInpageProvider;
+        ethereum?: Eip1193Provider;
     }
 }
 

@@ -2,176 +2,138 @@
 /* tslint:disable */
 /* eslint-disable */
 import type {
-  BaseContract,
-  BigNumberish,
-  BytesLike,
-  FunctionFragment,
-  Result,
-  Interface,
-  AddressLike,
-  ContractRunner,
-  ContractMethod,
-  Listener,
+    BaseContract,
+    BigNumberish,
+    BytesLike,
+    FunctionFragment,
+    Result,
+    Interface,
+    AddressLike,
+    ContractRunner,
+    ContractMethod,
+    Listener,
 } from "ethers";
 import type {
-  TypedContractEvent,
-  TypedDeferredTopicFilter,
-  TypedEventLog,
-  TypedListener,
-  TypedContractMethod,
+    TypedContractEvent,
+    TypedDeferredTopicFilter,
+    TypedEventLog,
+    TypedListener,
+    TypedContractMethod,
 } from "./common";
 
 export declare namespace ShowGirl {
-  export type AddressConfessionsStruct = {
-    confessions: string;
-    user: AddressLike;
-    avatar: string;
-    timestamp: BigNumberish;
-  };
+    export type AddressConfessionsStruct = {
+        confessions: string;
+        user: AddressLike;
+        avatar: string;
+        timestamp: BigNumberish;
+    };
 
-  export type AddressConfessionsStructOutput = [
-    confessions: string,
-    user: string,
-    avatar: string,
-    timestamp: bigint
-  ] & { confessions: string; user: string; avatar: string; timestamp: bigint };
+    export type AddressConfessionsStructOutput = [
+        confessions: string,
+        user: string,
+        avatar: string,
+        timestamp: bigint,
+    ] & { confessions: string; user: string; avatar: string; timestamp: bigint };
 }
 
 export interface ConfessionRoomInterface extends Interface {
-  getFunction(
-    nameOrSignature:
-      | "confess"
-      | "confessions"
-      | "getAllConfessions"
-      | "getConfessionsLength"
-  ): FunctionFragment;
+    getFunction(
+        nameOrSignature: "confess" | "confessions" | "getAllConfessions" | "getConfessionsLength"
+    ): FunctionFragment;
 
-  encodeFunctionData(functionFragment: "confess", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "confessions",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getAllConfessions",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getConfessionsLength",
-    values?: undefined
-  ): string;
+    encodeFunctionData(functionFragment: "confess", values: [string]): string;
+    encodeFunctionData(functionFragment: "confessions", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getAllConfessions", values?: undefined): string;
+    encodeFunctionData(functionFragment: "getConfessionsLength", values?: undefined): string;
 
-  decodeFunctionResult(functionFragment: "confess", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "confessions",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getAllConfessions",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getConfessionsLength",
-    data: BytesLike
-  ): Result;
+    decodeFunctionResult(functionFragment: "confess", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "confessions", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "getAllConfessions", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "getConfessionsLength", data: BytesLike): Result;
 }
 
 export interface ConfessionRoom extends BaseContract {
-  connect(runner?: ContractRunner | null): ConfessionRoom;
-  waitForDeployment(): Promise<this>;
+    connect(runner?: ContractRunner | null): ConfessionRoom;
+    waitForDeployment(): Promise<this>;
 
-  interface: ConfessionRoomInterface;
+    interface: ConfessionRoomInterface;
 
-  queryFilter<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined
-  ): Promise<Array<TypedEventLog<TCEvent>>>;
-  queryFilter<TCEvent extends TypedContractEvent>(
-    filter: TypedDeferredTopicFilter<TCEvent>,
-    fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined
-  ): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(
+        event: TCEvent,
+        fromBlockOrBlockhash?: string | number | undefined,
+        toBlock?: string | number | undefined
+    ): Promise<Array<TypedEventLog<TCEvent>>>;
+    queryFilter<TCEvent extends TypedContractEvent>(
+        filter: TypedDeferredTopicFilter<TCEvent>,
+        fromBlockOrBlockhash?: string | number | undefined,
+        toBlock?: string | number | undefined
+    ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  on<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
-  on<TCEvent extends TypedContractEvent>(
-    filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(
+        event: TCEvent,
+        listener: TypedListener<TCEvent>
+    ): Promise<this>;
+    on<TCEvent extends TypedContractEvent>(
+        filter: TypedDeferredTopicFilter<TCEvent>,
+        listener: TypedListener<TCEvent>
+    ): Promise<this>;
 
-  once<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
-  once<TCEvent extends TypedContractEvent>(
-    filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(
+        event: TCEvent,
+        listener: TypedListener<TCEvent>
+    ): Promise<this>;
+    once<TCEvent extends TypedContractEvent>(
+        filter: TypedDeferredTopicFilter<TCEvent>,
+        listener: TypedListener<TCEvent>
+    ): Promise<this>;
 
-  listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent
-  ): Promise<Array<TypedListener<TCEvent>>>;
-  listeners(eventName?: string): Promise<Array<Listener>>;
-  removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent
-  ): Promise<this>;
+    listeners<TCEvent extends TypedContractEvent>(
+        event: TCEvent
+    ): Promise<Array<TypedListener<TCEvent>>>;
+    listeners(eventName?: string): Promise<Array<Listener>>;
+    removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
 
-  confess: TypedContractMethod<[confessionText: string], [void], "nonpayable">;
+    confess: TypedContractMethod<[confessionText: string], [void], "nonpayable">;
 
-  confessions: TypedContractMethod<
-    [arg0: BigNumberish],
-    [
-      [string, string, string, bigint] & {
-        confessions: string;
-        user: string;
-        avatar: string;
-        timestamp: bigint;
-      }
-    ],
-    "view"
-  >;
+    confessions: TypedContractMethod<
+        [arg0: BigNumberish],
+        [
+            [string, string, string, bigint] & {
+                confessions: string;
+                user: string;
+                avatar: string;
+                timestamp: bigint;
+            },
+        ],
+        "view"
+    >;
 
-  getAllConfessions: TypedContractMethod<
-    [],
-    [ShowGirl.AddressConfessionsStructOutput[]],
-    "view"
-  >;
+    getAllConfessions: TypedContractMethod<[], [ShowGirl.AddressConfessionsStructOutput[]], "view">;
 
-  getConfessionsLength: TypedContractMethod<[], [bigint], "view">;
+    getConfessionsLength: TypedContractMethod<[], [bigint], "view">;
 
-  getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment
-  ): T;
+    getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
 
-  getFunction(
-    nameOrSignature: "confess"
-  ): TypedContractMethod<[confessionText: string], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "confessions"
-  ): TypedContractMethod<
-    [arg0: BigNumberish],
-    [
-      [string, string, string, bigint] & {
-        confessions: string;
-        user: string;
-        avatar: string;
-        timestamp: bigint;
-      }
-    ],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "getAllConfessions"
-  ): TypedContractMethod<
-    [],
-    [ShowGirl.AddressConfessionsStructOutput[]],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "getConfessionsLength"
-  ): TypedContractMethod<[], [bigint], "view">;
+    getFunction(
+        nameOrSignature: "confess"
+    ): TypedContractMethod<[confessionText: string], [void], "nonpayable">;
+    getFunction(nameOrSignature: "confessions"): TypedContractMethod<
+        [arg0: BigNumberish],
+        [
+            [string, string, string, bigint] & {
+                confessions: string;
+                user: string;
+                avatar: string;
+                timestamp: bigint;
+            },
+        ],
+        "view"
+    >;
+    getFunction(
+        nameOrSignature: "getAllConfessions"
+    ): TypedContractMethod<[], [ShowGirl.AddressConfessionsStructOutput[]], "view">;
+    getFunction(nameOrSignature: "getConfessionsLength"): TypedContractMethod<[], [bigint], "view">;
 
-  filters: {};
+    filters: {};
 }
