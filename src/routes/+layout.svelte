@@ -1,9 +1,9 @@
 <script>
-	import '../app.pcss';
+    import "../app.pcss";
 </script>
 
 <div class="app">
-	<main>
-		<slot />
-	</main>
+    <main>
+        <slot />
+    </main>
 </div>
