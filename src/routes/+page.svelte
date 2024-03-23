@@ -1,44 +1,20 @@
 <script lang="ts">
-    let comment = "";
-    let comments = [
-        {
-            author: "Michael Gough",
-            avatar: "https://flowbite.com/docs/images/people/profile-picture-2.jpg",
-            text: "Very straight-to-point article. Really worth time reading. Thank you! But tools are just the instruments for the UX designers. The knowledge of the design tools are as important as the creation of the design strategy.",
-            timestamp: "2022-02-08T00:00:00.000Z",
-        },
-        {
-            author: "Jese Leos",
-            avatar: "https://flowbite.com/docs/images/people/profile-picture-5.jpg",
-            text: "Much appreciated! Glad you liked it ☺️",
-            timestamp: "2022-02-12T00:00:00.000Z",
-        },
-        {
-            author: "Bonnie Green",
-            avatar: "https://flowbite.com/docs/images/people/profile-picture-3.jpg",
-            text: "The article covers the essentials, challenges, myths and stages the UX designer should consider while creating the design strategy.",
-            timestamp: "2022-03-12T00:00:00.000Z",
-        },
-        {
-            author: "Helene Engels",
-            avatar: "https://flowbite.com/docs/images/people/profile-picture-4.jpg",
-            text: "Thanks for sharing this. I do came from the Backend development and explored some of the tools to design my Side Projects.",
-            timestamp: "2022-06-23T00:00:00.000Z",
-        },
-    ];
+	import { ConfessionContractManager } from "$lib/utils/confession-contract-manager";
+	import { onMount } from "svelte";
+
+	export let data;
+
+    let confession = "";
+	let contractManager: ConfessionContractManager;
+
+	onMount(async () => {
+		contractManager = new ConfessionContractManager();
+		await contractManager.connect();
+	});
 
     const handleSubmit = () => {
-        if (comment.trim().length > 0) {
-            comments = [
-                ...comments,
-                {
-                    author: "You",
-                    avatar: "https://flowbite.com/docs/images/people/profile-picture-1.jpg",
-                    text: comment,
-                    timestamp: new Date().toISOString(),
-                },
-            ];
-            comment = "";
+        if (confession.trim().length > 0) {
+            confession = "";
         }
     };
 </script>
@@ -47,32 +23,32 @@
     <div class="mx-auto max-w-2xl px-4">
         <div class="mb-6 flex items-center justify-between">
             <h2 class="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">
-                Discussion ({comments.length})
+                Discussion ({data.confessions?.length ?? 0})
             </h2>
         </div>
         <form on:submit|preventDefault={handleSubmit} class="mb-6">
             <div
                 class="mb-4 rounded-lg rounded-t-lg border border-gray-200 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-800"
             >
-                <label for="comment" class="sr-only">Your comment</label>
+                <label for="confession" class="sr-only">Your confession</label>
                 <textarea
-                    id="comment"
+                    id="confession"
                     rows="6"
                     class="w-full border-0 px-0 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
-                    placeholder="Write a comment..."
+                    placeholder="Write a confession..."
                     required
-                    bind:value={comment}
+                    bind:value={confession}
                 />
             </div>
             <button
                 type="submit"
                 class="bg-primary-700 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800 inline-flex items-center rounded-lg px-4 py-2.5 text-center text-xs font-medium text-white focus:ring-4"
             >
-                Post comment
+                Post confession
             </button>
         </form>
 
-        {#each comments as comment (comment.timestamp)}
+        {#each data.confessions ?? [] as confession (confession.timestamp)}
             <article class="mb-3 rounded-lg bg-white p-6 text-base dark:bg-gray-900">
                 <footer class="mb-2 flex items-center justify-between">
                     <div class="flex items-center">
@@ -81,17 +57,17 @@
                         >
                             <img
                                 class="mr-2 h-6 w-6 rounded-full"
-                                src={comment.avatar}
-                                alt={comment.author}
+                                src={confession.avatar}
+                                alt={confession.user.toString()}
                             />
-                            {comment.author}
+                            {confession.user.toString()}
                         </p>
                         <p class="text-sm text-gray-600 dark:text-gray-400">
                             <time
-                                datetime={comment.timestamp}
-                                title={new Date(comment.timestamp).toLocaleString()}
+                                datetime={new Date(confession.timestamp.toString()).toLocaleString()}
+                                title={new Date(confession.timestamp.toString()).toLocaleString()}
                             >
-                                {new Date(comment.timestamp).toLocaleString()}
+                                {new Date(confession.timestamp.toString()).toLocaleString()}
                             </time>
                         </p>
                     </div>
@@ -150,7 +126,7 @@
                         </ul>
                     </div>
                 </footer>
-                <p class="text-gray-500 dark:text-gray-400">{comment.text}</p>
+                <p class="text-gray-500 dark:text-gray-400">{confession.confessions}</p>
                 <div class="mt-4 flex items-center space-x-4">
                     <button
                         type="button"
