@@ -7,6 +7,7 @@
     let confession = "";
     let tipReceiver = "";
     let tipAmount = 0;
+    let selectedConfessionHashAddress = "";
     let confessions: Confession[] = [];
     let contractManager: ConfessionContractManager;
     let onToggleTipModal = false;
@@ -36,6 +37,7 @@
             confessions[i].timestamp = Number.parseInt(
                 (BigInt(confessions[i].timestamp) * BigInt(1000)).toString()
             );
+            confessions[i].tipsAmount = Math.round(Number.parseInt(confessions[i].tipsAmount) / 10 ** 18 * 100 / 100).toString();
         }
         confessions = confessions.sort((a, b) => b.timestamp - a.timestamp);
 
@@ -45,12 +47,16 @@
     const handleSubmitTipTo = () => {
         onToggleTipModal = false;
         if (tipReceiver.trim().length > 0 && tipAmount > 0) {
-            contractManager.tipTo(tipReceiver, tipAmount);
+            contractManager.tipTo(tipReceiver, tipAmount, selectedConfessionHashAddress);
             tipReceiver = "";
             tipAmount = 0;
         }
     };
 </script>
+
+<svelte:head>
+    <title>Confession Room</title>
+</svelte:head>
 
 <section class="bg-white py-8 antialiased lg:py-16 dark:bg-gray-900">
     <div class="mx-auto max-w-2xl px-4">
@@ -93,9 +99,9 @@
                             <img
                                 class="mr-2 h-6 w-6 rounded-full"
                                 src={confession.avatar}
-                                alt={confession.user.toString()}
+                                alt={confession.author.toString()}
                             />
-                            {confession.user.toString()}
+                            {confession.author.toString()}
                         </p>
                     </div>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -114,11 +120,15 @@
                         class="flex items-center text-sm font-medium text-gray-600 hover:underline dark:text-gray-600"
                         on:click={() => {
                             onToggleTipModal = true;
-                            tipReceiver = confession.user.toString();
+                            tipReceiver = confession.author.toString();
+                            selectedConfessionHashAddress = confession.hashAddress;
                         }}
                     >
                     ▲ Tip
                     </button>
+                    <span class="text-sm font-medium text-gray-600">
+                        ${confession.tipsAmount}
+                    </span>
                 </div>
             </article>
         {/each}

@@ -1,6 +1,8 @@
 export interface Confession {
-    user: string;
+    author: string;
     avatar: string;
     confessions: string;
     timestamp: number;
+    tipsAmount: string;
+    hashAddress: string;
 }
