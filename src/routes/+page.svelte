@@ -1,171 +1,167 @@
 <script lang="ts">
+    import type { Confession } from "$lib/types/confession";
     import { ConfessionContractManager } from "$lib/utils/confession-contract-manager";
-    import type { MetaMaskInpageProvider } from "@metamask/providers";
     import { onMount } from "svelte";
+    import Web3 from "web3";
 
     let confession = "";
-    let confessionData = [];
+    let tipReceiver = "";
+    let tipAmount = 0;
+    let confessions: Confession[] = [];
     let contractManager: ConfessionContractManager;
+    let onToggleTipModal = false;
 
     onMount(async () => {
-		if (!window.ethereum) {
-			return;
-		}
+        if (!window.ethereum) {
+            return;
+        }
 
-        contractManager = new ConfessionContractManager(window.ethereum);
+        contractManager = new ConfessionContractManager(new Web3(window.ethereum));
         await contractManager.connect();
+
+        fetchConfessions();
     });
 
-    const handleSubmit = () => {
+    const handleSubmitConfession = () => {
         if (confession.trim().length > 0) {
-			contractManager.createConfession(confession);
+            contractManager.createConfession(confession);
             confession = "";
+        }
+    };
+
+    const fetchConfessions = async () => {
+        confessions = (await contractManager.getAllConfessions()) as Confession[];
+        for (let i = 0; i < confessions.length; i++) {
+            confessions[i].avatar = `https://${confessions[i].avatar}`;
+            confessions[i].timestamp = Number.parseInt(
+                (BigInt(confessions[i].timestamp) * BigInt(1000)).toString()
+            );
+        }
+        confessions = confessions.sort((a, b) => b.timestamp - a.timestamp);
+
+        setTimeout(fetchConfessions, 1000);
+    };
+
+    const handleSubmitTipTo = () => {
+        onToggleTipModal = false;
+        if (tipReceiver.trim().length > 0 && tipAmount > 0) {
+            contractManager.tipTo(tipReceiver, tipAmount);
+            tipReceiver = "";
+            tipAmount = 0;
         }
     };
 </script>
 
-{#if contractManager}
-    {#await contractManager.getConfessions()}
-        Loading...
-    {:then confessions}
-        <section class="bg-white py-8 antialiased lg:py-16 dark:bg-gray-900">
-            <div class="mx-auto max-w-2xl px-4">
-                <div class="mb-6 flex items-center justify-between">
-                    <h2 class="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">
-                        Discussion ({confessions?.length ?? 0})
-                    </h2>
-                </div>
-                <form on:submit|preventDefault={handleSubmit} class="mb-6">
-                    <div
-                        class="mb-4 rounded-lg rounded-t-lg border border-gray-200 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-800"
-                    >
-                        <label for="confession" class="sr-only">Your confession</label>
-                        <textarea
-                            id="confession"
-                            rows="6"
-                            class="w-full border-0 px-0 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
-                            placeholder="Write a confession..."
-                            required
-                            bind:value={confession}
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        class="bg-primary-700 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800 inline-flex items-center rounded-lg px-4 py-2.5 text-center text-xs font-medium text-white focus:ring-4"
-                    >
-                        Post confession
-                    </button>
-                </form>
-
-                {#each confessions ?? [] as confession (confession.timestamp)}
-                    <article class="mb-3 rounded-lg bg-white p-6 text-base dark:bg-gray-900">
-                        <footer class="mb-2 flex items-center justify-between">
-                            <div class="flex items-center">
-                                <p
-                                    class="mr-3 inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white"
-                                >
-                                    <img
-                                        class="mr-2 h-6 w-6 rounded-full"
-                                        src={confession.avatar}
-                                        alt={confession.user.toString()}
-                                    />
-                                    {confession.user.toString()}
-                                </p>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    <time
-                                        datetime={new Date(
-                                            confession.timestamp.toString()
-                                        ).toLocaleString()}
-                                        title={new Date(
-                                            confession.timestamp.toString()
-                                        ).toLocaleString()}
-                                    >
-                                        {new Date(confession.timestamp.toString()).toLocaleString()}
-                                    </time>
-                                </p>
-                            </div>
-                            <button
-                                id="dropdownComment1Button"
-                                data-dropdown-toggle="dropdownComment1"
-                                class="inline-flex items-center rounded-lg bg-white p-2 text-center text-sm font-medium text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-50 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                                type="button"
-                            >
-                                <svg
-                                    class="h-4 w-4"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="currentColor"
-                                    viewBox="0 0 16 3"
-                                >
-                                    <path
-                                        d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"
-                                    />
-                                </svg>
-                                <span class="sr-only">Comment settings</span>
-                            </button>
-                            <!-- Dropdown menu -->
-                            <div
-                                id="dropdownComment1"
-                                class="z-10 hidden w-36 divide-y divide-gray-100 rounded bg-white shadow dark:divide-gray-600 dark:bg-gray-700"
-                            >
-                                <ul
-                                    class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                                    aria-labelledby="dropdownMenuIconHorizontalButton"
-                                >
-                                    <li>
-                                        <a
-                                            href="#"
-                                            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                        >
-                                            Edit
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a
-                                            href="#"
-                                            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                        >
-                                            Remove
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a
-                                            href="#"
-                                            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                        >
-                                            Report
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </footer>
-                        <p class="text-gray-500 dark:text-gray-400">{confession.confessions}</p>
-                        <div class="mt-4 flex items-center space-x-4">
-                            <button
-                                type="button"
-                                class="flex items-center text-sm font-medium text-gray-500 hover:underline dark:text-gray-400"
-                            >
-                                <svg
-                                    class="mr-1.5 h-3.5 w-3.5"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 20 18"
-                                >
-                                    <path
-                                        stroke="currentColor"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"
-                                    />
-                                </svg>
-                                Reply
-                            </button>
-                        </div>
-                    </article>
-                {/each}
+<section class="bg-white py-8 antialiased lg:py-16 dark:bg-gray-900">
+    <div class="mx-auto max-w-2xl px-4">
+        <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">
+                Discussion ({confessions?.length ?? 0})
+            </h2>
+        </div>
+        <form on:submit|preventDefault={handleSubmitConfession} class="mb-6">
+            <div
+                class="mb-4 rounded-lg rounded-t-lg border border-gray-200 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-800"
+            >
+                <label for="confession" class="sr-only">Your confession</label>
+                <textarea
+                    id="confession"
+                    rows="6"
+                    class="w-full border-0 px-0 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+                    placeholder="Write a confession..."
+                    required
+                    bind:value={confession}
+                />
             </div>
-        </section>
-    {/await}
+            <div class="flex w-full justify-end">
+                <button
+                    type="submit"
+                    class="bg-primary-700 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800 inline-flex items-center rounded-lg px-4 py-2.5 text-center text-xs font-medium text-white focus:ring-4"
+                >
+                    Post confession
+                </button>
+            </div>
+        </form>
+
+        {#each confessions as confession (confession.timestamp)}
+            <article class="mb-3 rounded-lg bg-white p-6 text-base dark:bg-gray-900">
+                <div class="mb-2 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <p
+                            class="mr-3 inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white"
+                        >
+                            <img
+                                class="mr-2 h-6 w-6 rounded-full"
+                                src={confession.avatar}
+                                alt={confession.user.toString()}
+                            />
+                            {confession.user.toString()}
+                        </p>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        <time
+                            datetime={new Date(confession.timestamp).toLocaleString()}
+                            title={new Date(confession.timestamp).toLocaleString()}
+                        >
+                            {new Date(confession.timestamp).toLocaleString()}
+                        </time>
+                    </p>
+                </div>
+                <p class="text-gray-400 dark:text-gray-400">{confession.confessions}</p>
+                <div class="mt-4 flex items-center space-x-4">
+                    <button
+                        type="button"
+                        class="flex items-center text-sm font-medium text-gray-600 hover:underline dark:text-gray-600"
+                        on:click={() => {
+                            onToggleTipModal = true;
+                            tipReceiver = confession.user.toString();
+                        }}
+                    >
+                    ▲ Tip
+                    </button>
+                </div>
+            </article>
+        {/each}
+    </div>
+</section>
+
+{#if onToggleTipModal}
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+        <form on:submit|preventDefault={handleSubmitTipTo} class="mb-6 rounded-md bg-gray-900 p-6">
+            <span class="text-white">
+                Tip to
+                <span class="text-gray-400">{tipReceiver}</span>
+            </span>
+            <div class="h-6"></div>
+            <div
+                class="mb-4 rounded-lg rounded-t-lg border border-gray-200 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-800"
+            >
+                <label for="tipAmount" class="sr-only">Tip amount</label>
+                <input
+                    id="tipAmount"
+                    type="number"
+                    step="0.01"
+                    class="w-full border-0 px-0 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+                    placeholder="Tip amount"
+                    required
+                    bind:value={tipAmount}
+                />
+            </div>
+            <div class="flex w-full justify-end">
+                <button
+                    type="button"
+                    class="bg-primary-700 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800 inline-flex items-center rounded-lg px-4 py-2.5 text-center text-xs font-medium text-white focus:ring-4"
+                    on:click={() => (onToggleTipModal = false)}
+                >
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    class="bg-primary-700 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800 inline-flex items-center rounded-lg px-4 py-2.5 text-center text-xs font-medium text-white focus:ring-4"
+                >
+                    Confirm
+                </button>
+            </div>
+        </form>
+    </div>
 {/if}
