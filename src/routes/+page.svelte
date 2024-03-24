@@ -56,7 +56,7 @@
     <div class="mx-auto max-w-2xl px-4">
         <div class="mb-6 flex items-center justify-between">
             <h2 class="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">
-                Discussion ({confessions?.length ?? 0})
+                Confessions ({confessions?.length ?? 0})
             </h2>
         </div>
         <form on:submit|preventDefault={handleSubmitConfession} class="mb-6">
@@ -68,7 +68,7 @@
                     id="confession"
                     rows="6"
                     class="w-full border-0 px-0 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
-                    placeholder="Write a confession..."
+                    placeholder="Write your confession..."
                     required
                     bind:value={confession}
                 />
@@ -78,7 +78,7 @@
                     type="submit"
                     class="bg-primary-700 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800 inline-flex items-center rounded-lg px-4 py-2.5 text-center text-xs font-medium text-white focus:ring-4"
                 >
-                    Post confession
+                    Post
                 </button>
             </div>
         </form>
@@ -127,12 +127,12 @@
 
 {#if onToggleTipModal}
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-        <form on:submit|preventDefault={handleSubmitTipTo} class="mb-6 rounded-md bg-gray-900 p-6">
+        <form on:submit|preventDefault={handleSubmitTipTo} class="mb-6 rounded-lg bg-gray-900 p-6">
             <span class="text-white">
                 Tip to
                 <span class="text-gray-400">{tipReceiver}</span>
             </span>
-            <div class="h-6"></div>
+            <div class="h-4"></div>
             <div
                 class="mb-4 rounded-lg rounded-t-lg border border-gray-200 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-800"
             >
@@ -147,7 +147,7 @@
                     bind:value={tipAmount}
                 />
             </div>
-            <div class="flex w-full justify-end">
+            <div class="flex w-full justify-end gap-4">
                 <button
                     type="button"
                     class="bg-primary-700 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800 inline-flex items-center rounded-lg px-4 py-2.5 text-center text-xs font-medium text-white focus:ring-4"
